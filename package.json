@@ -1,0 +1,17 @@
+{ "name": "formatdate"
+, "description": "a little bit more than just strftime"
+, "version": "0.0.0"
+, "homepage": "https://github.com/dodo/node-formatdate"
+, "author": "dodo (https://github.com/dodo)"
+, "repository": {"type": "git", "url": "git://github.com/dodo/node-formatdate.git"}
+, "main": "formatdate.js"
+, "engines": {"node": "0.4.x"}
+, "keywords": ["format", "date", "live", "time"]
+, "scripts": {
+    "test": "./benchmark",
+    "preinstall": "#preinstall DO NOTHING",
+    "install": "node-waf configure build",
+    "update": "node-waf build"}
+, "dependencies": {
+    "coffee-script": ">= 1.1.2"}
+}
