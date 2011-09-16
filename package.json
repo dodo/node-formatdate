@@ -1,12 +1,12 @@
 { "name": "formatdate"
 , "description": "a little bit more than just strftime"
-, "version": "0.0.0"
+, "version": "0.0.1"
 , "homepage": "https://github.com/dodo/node-formatdate"
 , "author": "dodo (https://github.com/dodo)"
 , "repository": {"type": "git", "url": "git://github.com/dodo/node-formatdate.git"}
 , "main": "formatdate.js"
 , "engines": {"node": "0.4.x"}
-, "keywords": ["format", "date", "live", "time"]
+, "keywords": ["format", "date", "live", "time", "strftime", "css", "hook"]
 , "scripts": {
     "test": "./benchmark",
     "preinstall": "#preinstall DO NOTHING",
