@@ -188,9 +188,6 @@ exports.hook = (elem, opts = {}) ->
                 el.text strftime format, el.text(), opts.locale
             return
 
-        if interval and not $(elem).find(".#{opts.css.formatted}").length
-            clearInterval interval
-
-    interval = setInterval assimilate_elements, opts.hook.interval if opts.update
+    setInterval assimilate_elements, opts.hook.interval if opts.update
     do assimilate_elements
 
