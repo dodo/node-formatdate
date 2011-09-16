@@ -1,7 +1,7 @@
 { floor, round } = Math
 { isArray } = Array
 
-exports ?= this
+exports ?= this.formatdate = {}
 
 # helpers
 
@@ -33,16 +33,19 @@ pad = (len, n, str="0") ->
 # constants (bot changeable)
 
 exports.options = defaults =
+    update: on
     hook:
         interval: 5000 # 5 seconds
     css:
         'class': "format-date"
         formatted: "formatted-date"
+        ago: "ago"
     max:
         amount: 42
         unit:   9  # century
 
 exports.locale = locale =
+    'default':"%T"
     formats:
         '%':"%"
         ' ':" "
@@ -124,7 +127,7 @@ exports.formats = formats =
 
 # functions
 
-exports.strftime = strftime = (text = "%T", d = null, loc = locale) ->
+exports.strftime = strftime = (text = locale.default, d = null, loc = locale) ->
     d ?= new Date
     d = new Date(d) if typeof d is 'string'
     for k, f of formats
@@ -143,31 +146,51 @@ exports.ago = ago = (dd, opts = {}) ->
 
 exports.from_now = from_now = (date, opts = {}) ->
     return unless date
+    opts.locale ?= locale
     now = new Date((new Date()).toISOString())
     date = new Date(date) if typeof date is 'string'
-    ago(now - date, opts) or strftime(opts.format, date)
+    ago(now - date, opts) or strftime(opts.format, date, opts.locale)
 
 
 exports.hook = (elem, opts = {}) ->
     opts.css ?= {}
     opts.hook ?= {}
     opts.locale ?= locale
+    opts.update ?= defaults.update
+    opts.css.ago ?= defaults.css.ago
     opts.css['class'] ?= defaults.css['class']
     opts.css.formatted ?= defaults.css.formatted
     opts.hook.interval ?= defaults.hook.interval
+
     assimilate_elements = ->
         $(elem).find(".#{opts.css.formatted}").each ->
             el = $(this)
+            format = el.attr('strftitle') or opts.format
+            el.attr 'title', strftime format, el.attr('date'), opts.locale
             format = el.attr('strftime') or opts.format
-            el.text from_now my.attr('date'), deep_merge, opts, {format}
+            if el.hasClass opts.css.ago
+                el.text from_now el.attr('date'), deep_merge opts, {format}
+            else
+                el.text strftime format, el.attr('date'), opts.locale
+            return
+
         $(elem).find(".#{opts.css['class']}").each ->
             el = $(this)
-            format = el.attr('strftime') or opts.format
             el.removeClass opts.css['class']
             el.addClass opts.css.formatted
             el.attr 'date', el.text()
+            format = el.attr('strftitle') or opts.format
             el.attr 'title', strftime format, el.text(), opts.locale
-            el.text from_now el.text(), deep_merge, opts, {format}
-    setInterval assimilate_elements, opts.hook.interval
+            format = el.attr('strftime') or opts.format
+            if el.hasClass opts.css.ago
+                el.text from_now el.text(), deep_merge opts, {format}
+            else
+                el.text strftime format, el.text(), opts.locale
+            return
+
+        if interval and not $(elem).find(".#{opts.css.formatted}").length
+            clearInterval interval
+
+    interval = setInterval assimilate_elements, opts.hook.interval if opts.update
     do assimilate_elements
 
