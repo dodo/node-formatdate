@@ -1,8 +1,20 @@
 { floor, round } = Math
+{ isArray } = Array
 
 exports ?= this
 
 # helpers
+
+deep_merge = (objs...) ->
+    objs = objs[0] if isArray(objs[0])
+    res = {}
+    for obj in objs
+        for k, v of obj
+            if typeof(v) is 'object' and not isArray(v)
+                res[k] = deep_merge(res[k] or {}, v)
+            else
+                res[k] = v
+    res
 
 foldl = (object, array, worker) ->
     object = worker(object, value) for value in array
@@ -21,6 +33,11 @@ pad = (len, n, str="0") ->
 # constants (bot changeable)
 
 exports.options = defaults =
+    hook:
+        interval: 5000 # 5 seconds
+    css:
+        'class': "format-date"
+        formatted: "formatted-date"
     max:
         amount: 42
         unit:   9  # century
@@ -124,12 +141,33 @@ exports.ago = ago = (dd, opts = {}) ->
     opts.locale.ago x, i, opts
 
 
-exports.from_now = (date, opts = {}) ->
+exports.from_now = from_now = (date, opts = {}) ->
     return unless date
     now = new Date((new Date()).toISOString())
     date = new Date(date) if typeof date is 'string'
     ago(now - date, opts) or strftime(opts.format, date)
 
 
-
+exports.hook = (elem, opts = {}) ->
+    opts.css ?= {}
+    opts.hook ?= {}
+    opts.locale ?= locale
+    opts.css['class'] ?= defaults.css['class']
+    opts.css.formatted ?= defaults.css.formatted
+    opts.hook.interval ?= defaults.hook.interval
+    assimilate_elements = ->
+        $(elem).find(".#{opts.css.formatted}").each ->
+            el = $(this)
+            format = el.attr('strftime') or opts.format
+            el.text from_now my.attr('date'), deep_merge, opts, {format}
+        $(elem).find(".#{opts.css['class']}").each ->
+            el = $(this)
+            format = el.attr('strftime') or opts.format
+            el.removeClass opts.css['class']
+            el.addClass opts.css.formatted
+            el.attr 'date', el.text()
+            el.attr 'title', strftime format, el.text(), opts.locale
+            el.text from_now el.text(), deep_merge, opts, {format}
+    setInterval assimilate_elements, opts.hook.interval
+    do assimilate_elements
 
