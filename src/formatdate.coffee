@@ -165,23 +165,23 @@ exports.hook = (elem, opts = {}) ->
     assimilate_elements = ->
         $(elem).find(".#{opts.css.formatted}").each ->
             el = $(this)
-            format = el.attr('strftitle') or opts.format
-            el.attr 'title', strftime format, el.attr('date'), opts.locale
-            format = el.attr('strftime') or opts.format
+            format = el.attr('data-strftitle') or opts.format
+            el.attr 'title', strftime format, el.attr('data-date'), opts.locale
+            format = el.attr('data-strftime') or opts.format
             if el.hasClass opts.css.ago
-                el.text from_now el.attr('date'), deep_merge opts, {format}
+                el.text from_now el.attr('data-date'), deep_merge opts, {format}
             else
-                el.text strftime format, el.attr('date'), opts.locale
+                el.text strftime format, el.attr('data-date'), opts.locale
             return
 
         $(elem).find(".#{opts.css['class']}").each ->
             el = $(this)
             el.removeClass opts.css['class']
             el.addClass opts.css.formatted
-            el.attr 'date', el.text()
-            format = el.attr('strftitle') or opts.format
+            el.attr 'data-date', el.text()
+            format = el.attr('data-strftitle') or opts.format
             el.attr 'title', strftime format, el.text(), opts.locale
-            format = el.attr('strftime') or opts.format
+            format = el.attr('data-strftime') or opts.format
             if el.hasClass opts.css.ago
                 el.text from_now el.text(), deep_merge opts, {format}
             else
