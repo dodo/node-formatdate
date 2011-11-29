@@ -5,7 +5,7 @@
 , "author": "dodo (https://github.com/dodo)"
 , "repository": {"type": "git", "url": "git://github.com/dodo/node-formatdate.git"}
 , "main": "formatdate.js"
-, "engines": {"node": "0.4.x"}
+, "engines": {"node": ">= 0.4.x"}
 , "keywords": ["format", "date", "live", "time", "strftime", "css", "hook"]
 , "scripts": {
     "test": "./benchmark",
