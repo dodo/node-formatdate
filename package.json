@@ -9,9 +9,8 @@
 , "keywords": ["format", "date", "live", "time", "strftime", "css", "hook"]
 , "scripts": {
     "test": "./benchmark",
-    "preinstall": "#preinstall DO NOTHING",
-    "install": "node-waf configure build",
-    "update": "node-waf build"}
-, "dependencies": {
+    "pre-publish": "cake build"}
+, "devDependencies": {
+    "muffin": "0.2.6",
     "coffee-script": ">= 1.1.2"}
 }

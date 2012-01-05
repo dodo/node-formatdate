@@ -1,2 +1,2 @@
 
-module.exports = require('./build/default/formatdate')
+module.exports = require('./lib/formatdate')
