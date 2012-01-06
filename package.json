@@ -9,7 +9,7 @@
 , "keywords": ["format", "date", "live", "time", "strftime", "css", "hook"]
 , "scripts": {
     "test": "./benchmark",
-    "pre-publish": "cake build"}
+    "prepublish": "cake build"}
 , "devDependencies": {
     "muffin": "0.2.6",
     "coffee-script": ">= 1.1.2"}
