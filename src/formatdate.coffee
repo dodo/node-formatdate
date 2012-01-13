@@ -37,8 +37,6 @@ exports.options = defaults =
     hook:
         interval: 5000 # 5 seconds
     css:
-        'class': "format-date"
-        formatted: "formatted-date"
         ago: "ago"
     max:
         amount: 42
@@ -158,8 +156,6 @@ exports.hook = hook = (elems, opts = {}) ->
     opts.locale ?= locale
     opts.update ?= defaults.update
     opts.css.ago ?= defaults.css.ago
-    opts.css['class'] ?= defaults.css['class']
-    opts.css.formatted ?= defaults.css.formatted
     opts.hook.interval ?= defaults.hook.interval
 
     assimilate_elements = ->
@@ -178,8 +174,6 @@ exports.hook = hook = (elems, opts = {}) ->
 
         $(elems).not(dates).each ->
             el = $(this)
-            el.removeClass opts.css['class']
-            el.addClass opts.css.formatted
             el.attr 'data-date', el.text()
             format = el.attr('data-strftitle') or opts.format
             el.attr 'title', strftime format, el.text(), opts.locale
