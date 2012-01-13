@@ -152,7 +152,7 @@ exports.from_now = from_now = (date, opts = {}) ->
     ago(now - date, opts) or strftime(opts.format, date, opts.locale)
 
 
-exports.hook = hook = (elem, opts = {}) ->
+exports.hook = hook = (elems, opts = {}) ->
     opts.css ?= {}
     opts.hook ?= {}
     opts.locale ?= locale
@@ -163,7 +163,9 @@ exports.hook = hook = (elem, opts = {}) ->
     opts.hook.interval ?= defaults.hook.interval
 
     assimilate_elements = ->
-        $(elem).find(".#{opts.css.formatted}").each ->
+
+        dates = $(elems).filter("[data-date]")
+        dates.each ->
             el = $(this)
             format = el.attr('data-strftitle') or opts.format
             el.attr 'title', strftime format, el.attr('data-date'), opts.locale
@@ -174,7 +176,7 @@ exports.hook = hook = (elem, opts = {}) ->
                 el.text strftime format, el.attr('data-date'), opts.locale
             return
 
-        $(elem).find(".#{opts.css['class']}").each ->
+        $(elems).not(dates).each ->
             el = $(this)
             el.removeClass opts.css['class']
             el.addClass opts.css.formatted
@@ -194,6 +196,5 @@ exports.hook = hook = (elem, opts = {}) ->
 # export to jquery if on browser side
 
 jQuery?.fn.formatdate = (opts) ->
-    @each ->
-        hook this, opts
+    hook this, opts
 
