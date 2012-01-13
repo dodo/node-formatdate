@@ -152,7 +152,7 @@ exports.from_now = from_now = (date, opts = {}) ->
     ago(now - date, opts) or strftime(opts.format, date, opts.locale)
 
 
-exports.hook = (elem, opts = {}) ->
+exports.hook = hook = (elem, opts = {}) ->
     opts.css ?= {}
     opts.hook ?= {}
     opts.locale ?= locale
@@ -190,4 +190,10 @@ exports.hook = (elem, opts = {}) ->
 
     setInterval assimilate_elements, opts.hook.interval if opts.update
     do assimilate_elements
+
+# export to jquery if on browser side
+
+jQuery?.fn.formatdate = (opts) ->
+    @each ->
+        hook.call this, opts
 
