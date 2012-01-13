@@ -195,5 +195,5 @@ exports.hook = hook = (elem, opts = {}) ->
 
 jQuery?.fn.formatdate = (opts) ->
     @each ->
-        hook.call this, opts
+        hook this, opts
 
