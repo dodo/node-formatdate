@@ -12,7 +12,7 @@
     "prepublish": "cake build"}
 , "devDependencies": {
     "browserify": "1.6.1",
-    "scopify": ">= 0.1.1",
+    "scopify": ">= 0.2.1",
     "muffin": "0.2.6",
     "coffee-script": ">= 1.1.2"}
 }
