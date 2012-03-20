@@ -41,6 +41,10 @@ exports.options = defaults =
     max:
         amount: 42
         unit:   9  # century
+    min:
+        amount: 1
+        unit: 2  # minute
+        string: "a moment"  # string to show when below min.
 
 exports.locale = locale =
     'default':"%T"
@@ -66,8 +70,14 @@ exports.locale = locale =
         opts.max ?= {}
         opts.max.unit   ?= defaults.max.unit
         opts.max.amount ?= defaults.max.amount
+        opts.min ?= {}
+        opts.min.unit ?= defaults.min.unit
+        opts.min.amount ?= defaults.min.amount
+        opts.min.string ?= defaults.min.string
         # turn ago off when a special amount of special unit is reached (defaults to strftime)
         return off if unit is opts.max.unit and amount > opts.max.amount
+        # return special string when below a minimum amount of a minimum unit.
+        return opts.min.string + " ago" if unit < opts.min.unit or ( unit is opts.min.unit and amount < opts.min.amount )
         res = ""
         res += amount if amount > 1
         res += "a" if amount <= 1
