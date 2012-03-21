@@ -42,9 +42,9 @@ exports.options = defaults =
         amount: 42
         unit:   9  # century
     min:
-        amount: 1
-        unit: 2  # minute
-        string: "a moment ago"  # string to show when below min.
+        amount: 5
+        unit: 1  # second
+        string: "just now"  # string to show when below min.
 
 exports.locale = locale =
     'default':"%T"
