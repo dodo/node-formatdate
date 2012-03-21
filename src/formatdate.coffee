@@ -75,7 +75,8 @@ exports.locale = locale =
         opts.min.amount ?= defaults.min.amount
         opts.min.string ?= defaults.min.string
         # turn ago off when a special amount of special unit is reached (defaults to strftime)
-        return off if unit is opts.max.unit and amount > opts.max.amount
+        if unit > opts.max.unit or ( unit is opts.max.unit and amount > opts.max.amount )
+            return off
         # return special string when below a minimum amount of a minimum unit.
         if unit < opts.min.unit or ( unit is opts.min.unit and amount < opts.min.amount )
             return opts.min.string
