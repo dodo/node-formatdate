@@ -186,14 +186,14 @@ exports.hook = hook = (elems, opts = {}) ->
 
         $(elems).not(dates).each ->
             el = $(this)
-            el.attr 'data-date', el.text()
+            el.attr 'data-date', el.attr('datetime') ? el.text()
             format = el.attr('data-strftitle') or opts.format
-            el.attr 'title', strftime format, el.text(), opts.locale
+            el.attr 'title', strftime format, el.attr('data-date'), opts.locale
             format = el.attr('data-strftime') or opts.format
             if el.hasClass opts.css.ago
-                el.text from_now el.text(), deep_merge opts, {format}
+                el.text from_now el.attr('data-date'), deep_merge opts, {format}
             else
-                el.text strftime format, el.text(), opts.locale
+                el.text strftime format, el.attr('data-date'), opts.locale
             return
 
     setInterval assimilate_elements, opts.hook.interval if opts.update
