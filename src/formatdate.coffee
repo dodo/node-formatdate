@@ -164,7 +164,7 @@ exports.hook = hook = (elems, opts = {}) ->
 
 hook.update = (el, opts = {}) ->
     # either somthing custom or a <time> element
-    date = el.attr('data-date') ? el.attr('datetime')
+    date = el?.attr?('data-date') ? el?.attr?('datetime')
     return if not date?
     format = el.attr('data-strftitle') or opts.format
     el.attr 'title', strftime format, date, opts.locale
