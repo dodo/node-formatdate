@@ -169,7 +169,8 @@ hook.update = (el, opts = {}) ->
     format = el.attr('data-strftitle') or opts.format
     el.attr 'title', strftime format, date, opts.locale
     format = el.attr('data-strftime') or opts.format
-    if el.hasClass opts.css.ago
+    cls = el.attr('class') ? ""
+    if cls.indexOf(opts.css.ago) isnt -1
         el.text from_now date, deep_merge opts, {format}
     else
         el.text strftime format, date, opts.locale
