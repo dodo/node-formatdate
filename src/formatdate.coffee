@@ -30,21 +30,7 @@ pad = (len, n, str="0") ->
     res = str+res while res.length < len
     res
 
-# constants (bot changeable)
-
-exports.options = defaults =
-    update: on
-    hook:
-        interval: 5000 # 5 seconds
-    css:
-        ago: "ago"
-    max:
-        amount: 42
-        unit:   9  # century
-    min:
-        amount: 5
-        unit: 1  # second
-        string: "just now"  # string to show when below min.
+# constants (changeable)
 
 exports.locale = locale =
     'default':"%T"
@@ -169,12 +155,9 @@ exports.hook = hook = (elems, opts = {}) ->
     opts.update ?= defaults.update
     opts.css.ago ?= defaults.css.ago
     opts.hook.interval ?= defaults.hook.interval
-
+    opts.hook.update ?= defaults.hook.update
     assimilate_elements = ->
-        $(elems)
-            .filter("time, [data-date]")
-            .each( -> hook.update($(this), opts))
-
+        opts.hook.update(elems, opts)
     setInterval assimilate_elements, opts.hook.interval if opts.update
     do assimilate_elements
 
@@ -182,6 +165,7 @@ exports.hook = hook = (elems, opts = {}) ->
 hook.update = (el, opts = {}) ->
     # either somthing custom or a <time> element
     date = el.attr('data-date') ? el.attr('datetime')
+    return if not date?
     format = el.attr('data-strftitle') or opts.format
     el.attr 'title', strftime format, date, opts.locale
     format = el.attr('data-strftime') or opts.format
@@ -190,6 +174,38 @@ hook.update = (el, opts = {}) ->
     else
         el.text strftime format, date, opts.locale
     return
+
+# update the ui with helpers
+
+hook.update.dynamictemplate = (elems, opts = {}) ->
+    for el in elems # asume, that this is a list of elements with time
+        hook.update(el, opts)
+    return
+
+
+hook.update.jQuery = (elems, opts = {}) ->
+    $(elems)
+        .filter("time, [data-date]")
+        .each( -> hook.update($(this), opts))
+
+
+# defaults (changeable)
+
+exports.options = defaults =
+    update: on
+    hook:
+        interval: 5000 # 5 seconds
+        update:   hook.update.jQuery
+    css:
+        ago: "ago"
+    max:
+        amount: 42
+        unit:   9  # century
+    min:
+        amount: 5
+        unit: 1  # second
+        string: "just now"  # string to show when below min.
+
 
 # export to jquery if on browser side
 
