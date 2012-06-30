@@ -171,35 +171,25 @@ exports.hook = hook = (elems, opts = {}) ->
     opts.hook.interval ?= defaults.hook.interval
 
     assimilate_elements = ->
-
-        dates = $(elems).filter("[data-date]")
-        dates.each ->
-            el = $(this)
-            date = el.attr('data-date')
-            format = el.attr('data-strftitle') or opts.format
-            el.attr 'title', strftime format, date, opts.locale
-            format = el.attr('data-strftime') or opts.format
-            if el.hasClass opts.css.ago
-                el.text from_now date, deep_merge opts, {format}
-            else
-                el.text strftime format, date, opts.locale
-            return
-
-        $(elems).not(dates).each ->
-            el = $(this)
-            date = el.attr('data-date')
-            format = el.attr('data-strftitle') or opts.format
-            el.attr 'title', strftime format, date, opts.locale
-            format = el.attr('data-strftime') or opts.format
-            if el.hasClass opts.css.ago
-                el.text from_now date, deep_merge opts, {format}
-            else
-                el.text strftime format, date, opts.locale
-            return
+        $(elems)
+            .filter("time, [data-date]")
+            .each( -> hook.update($(this), opts))
 
     setInterval assimilate_elements, opts.hook.interval if opts.update
     do assimilate_elements
 
+
+hook.update = (el, opts = {}) ->
+    # either somthing custom or a <time> element
+    date = el.attr('data-date') ? el.attr('datetime')
+    format = el.attr('data-strftitle') or opts.format
+    el.attr 'title', strftime format, date, opts.locale
+    format = el.attr('data-strftime') or opts.format
+    if el.hasClass opts.css.ago
+        el.text from_now date, deep_merge opts, {format}
+    else
+        el.text strftime format, date, opts.locale
+    return
 
 # export to jquery if on browser side
 
