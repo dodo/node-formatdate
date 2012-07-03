@@ -60,6 +60,7 @@ exports.locale = locale =
         opts.min.unit ?= defaults.min.unit
         opts.min.amount ?= defaults.min.amount
         opts.min.string ?= defaults.min.string
+        opts.show_ago ?= defaults.show_ago
         # turn ago off when a special amount of special unit is reached (defaults to strftime)
         if unit > opts.max.unit or ( unit is opts.max.unit and amount > opts.max.amount )
             return off
@@ -73,7 +74,7 @@ exports.locale = locale =
         res += " "+opts.locale.unit[unit]
         res = res.substr(0, res.length-1) + "ie" if amount > 1 and unit is 9 # century
         res += "s" if amount > 1
-        res += " ago"
+        res += " ago" if opts.show_ago
 
 
 exports.formats = formats =
@@ -206,6 +207,7 @@ exports.options = defaults =
         amount: 5
         unit: 1  # second
         string: "just now"  # string to show when below min.
+    show_ago: true
 
 
 # export to jquery if on browser side
