@@ -75,6 +75,7 @@ exports.locale = locale =
         res = res.substr(0, res.length-1) + "ie" if amount > 1 and unit is 9 # century
         res += "s" if amount > 1
         res += " ago" if opts.show_ago
+        return res
 
 
 exports.formats = formats =
@@ -90,7 +91,7 @@ exports.formats = formats =
     e: (d,l) -> formats.d(d)?.replace('0', l.formats[' '])
     E: (d,l) -> # TODO Modifier: use alternative format, see below. (SU)
     F: (d,l) -> strftime(l.formats.F, d, l)
-    f: (d,l) -> ago d, {locale:l, show_ago: false}
+    f: (d,l) -> ago(d, {locale:l, show_ago: false})
     G: (d  ) -> # TODO The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. (TZ)
     g: (d  ) -> # TODO Like %G, but without century, i.e., with a 2-digit year (00-99). (TZ)
     h: (d,l) -> strftime(l.formats.h, d, l)
@@ -147,7 +148,7 @@ exports.from_now = from_now = (date, opts = {}) ->
     opts.locale ?= locale
     now = new Date((new Date()).toISOString())
     date = new Date(date) if typeof date is 'string'
-    ago(now - date, opts) or strftime(opts.format, date, opts.locale)
+    strftime(opts.format, now - date, opts.locale)
 
 
 exports.hook = hook = (elems, opts = {}) ->
@@ -165,7 +166,7 @@ exports.hook = hook = (elems, opts = {}) ->
 
 
 hook.update = (el, opts = {}) ->
-    # either somthing custom or a <time> element
+    # either something custom or a <time> element
     date = el?.attr?('data-date') ? el?.attr?('datetime')
     return if not date?
     format = el.attr('data-strftitle') or opts.format
@@ -173,6 +174,7 @@ hook.update = (el, opts = {}) ->
     format = el.attr('data-strftime') or opts.format
     cls = el.attr('class') ? ""
     if cls.indexOf(opts.css.ago) isnt -1
+        # the 'ago' class is set, so use a relative date.
         el.text from_now date, deep_merge opts, {format}
     else
         el.text strftime format, date, opts.locale
