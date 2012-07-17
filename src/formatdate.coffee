@@ -5,17 +5,6 @@ exports ?= this.formatdate = {}
 
 # helpers
 
-deep_merge = (objs...) ->
-    objs = objs[0] if isArray(objs[0])
-    res = {}
-    for obj in objs
-        for k, v of obj
-            if typeof(v) is 'object' and not isArray(v)
-                res[k] = deep_merge(res[k] or {}, v)
-            else
-                res[k] = v
-    res
-
 foldl = (object, array, worker) ->
     object = worker(object, value) for value in array
     object
@@ -169,15 +158,15 @@ hook.update = (el, opts = {}) ->
     # either something custom or a <time> element
     date = el?.attr?('data-date') ? el?.attr?('datetime')
     return if not date?
-    format = el.attr('data-strftitle') or opts.format
-    el.attr 'title', strftime format, date, opts.locale
-    format = el.attr('data-strftime') or opts.format
+    opts.format = el.attr('data-strftime') or opts.format
+    title_format = el.attr('data-strftitle') or opts.format
+    el.attr 'title', strftime title_format, date, opts.locale
     cls = el.attr('class') ? ""
     if cls.indexOf(opts.css.ago) isnt -1
         # the 'ago' class is set, so use a relative date.
-        el.text from_now date, deep_merge opts, {format}
+        el.text from_now date, opts
     else
-        el.text strftime format, date, opts.locale
+        el.text strftime opts.format, date, opts.locale
     return
 
 # update the ui with helpers
