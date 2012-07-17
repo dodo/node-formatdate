@@ -91,7 +91,7 @@ exports.formats = formats =
     e: (d,l) -> formats.d(d)?.replace('0', l.formats[' '])
     E: (d,l) -> # TODO Modifier: use alternative format, see below. (SU)
     F: (d,l) -> strftime(l.formats.F, d, l)
-    f: (d,l) -> ago(d, {locale:l, show_ago: false})
+    f: (d,l) -> ago(d, locale:l, show_ago:no)
     G: (d  ) -> # TODO The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. (TZ)
     g: (d  ) -> # TODO Like %G, but without century, i.e., with a 2-digit year (00-99). (TZ)
     h: (d,l) -> strftime(l.formats.h, d, l)
@@ -198,6 +198,7 @@ hook.update.jQuery = (elems, opts = {}) ->
 
 exports.options = defaults =
     update: on
+    show_ago: yes
     hook:
         interval: 5000 # 5 seconds
         update:   hook.update.jQuery
@@ -210,7 +211,6 @@ exports.options = defaults =
         amount: 5
         unit: 1  # second
         string: "just now"  # string to show when below min.
-    show_ago: true
 
 
 # export to jquery if on browser side
