@@ -1,3 +1,4 @@
+now = performance?.now ? Date?.now ? -> new Date().getTime()
 { floor, round } = Math
 { isArray } = Array
 
@@ -73,14 +74,14 @@ exports.formats = formats =
     A: (d,l) -> l.day.full[d.getDay()]
     b: (d,l) -> l.month.abbr[d.getMonth()]
     B: (d,l) -> l.month.full[d.getMonth()]
-    c: (d,l) -> ago d, locale:l
+    c: (d,l) -> # TODO The preferred date and time representation for the current locale.
     C: (d  ) -> pad 2, floor(d.getFullYear()/100)
     d: (d  ) -> pad 2, d.getDate()
     D: (d,l) -> strftime(l.formats.D, d, l)
     e: (d,l) -> formats.d(d)?.replace('0', l.formats[' '])
     E: (d,l) -> # TODO Modifier: use alternative format, see below. (SU)
     F: (d,l) -> strftime(l.formats.F, d, l)
-    f: (d,l) -> ago(d, locale:l, show_ago:no)
+    f: (d,l) -> ago(now() - d.getTime(), locale:l, show_ago:no)
     G: (d  ) -> # TODO The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. (TZ)
     g: (d  ) -> # TODO Like %G, but without century, i.e., with a 2-digit year (00-99). (TZ)
     h: (d,l) -> strftime(l.formats.h, d, l)
@@ -135,9 +136,8 @@ exports.ago = ago = (dd, opts = {}) ->
 exports.from_now = from_now = (date, opts = {}) ->
     return unless date
     opts.locale ?= locale
-    now = new Date((new Date()).toISOString())
-    date = new Date(date) if typeof date is 'string'
-    strftime(opts.format, now - date, opts.locale)
+    date = new Date(date) if typeof date is 'string' or typeof date is 'number'
+    ago(now() - date.getTime(), opts) or strftime(opts.format, date, opts.locale)
 
 
 exports.hook = hook = (elems, opts = {}) ->
