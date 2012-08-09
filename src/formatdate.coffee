@@ -152,15 +152,14 @@ exports.smart = (elem, opts = {}) ->
     res = stop:  -> clearInterval(interval) if interval?
     res.update = ->
         date = hook.update(elem, opts)
-        if not date?
+        if not date > 0
             do res.stop
             interval = setInterval(res.update, opts.hook.interval)
             return
         {unit, size} = separate_unit(date)
         return if unit is old_unit
         return res.stop() if unit > opts.smart.max_unit
-        t = opts.hook.interval
-        t = unit * size or t if unit > 0
+        t = (unit * size) or opts.hook.interval
         do res.stop
         interval = setInterval(res.update, t)
         old_unit = unit
