@@ -1,6 +1,6 @@
 { "name": "formatdate"
 , "description": "a little bit more than just strftime"
-, "version": "0.3.1"
+, "version": "0.3.2"
 , "homepage": "https://github.com/dodo/node-formatdate"
 , "author": "dodo (https://github.com/dodo)"
 , "repository": {"type": "git", "url": "git://github.com/dodo/node-formatdate.git"}
@@ -10,6 +10,8 @@
 , "scripts": {
     "test": "./benchmark",
     "prepublish": "cake build"}
+, "dependencies": {
+    "deepmerge": ">= 0.2.5"}
 , "devDependencies": {
     "browserify": "1.6.1",
     "scopify": ">= 0.2.1",

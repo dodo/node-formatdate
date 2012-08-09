@@ -1,3 +1,4 @@
+deepmerge = require 'deepmerge'
 now = performance?.now ? Date?.now ? -> new Date().getTime()
 { floor, round } = Math
 { isArray } = Array
@@ -145,7 +146,7 @@ exports.from_now = from_now = (date, opts = {}) ->
 
 
 exports.smart = (elem, opts = {}) ->
-    fill_defaults(opts)
+    opts = deepmerge(defaults, opts)
     old_unit = -1
     interval = undefined
     res = stop:  -> clearInterval(interval) if interval?
@@ -167,7 +168,7 @@ exports.smart = (elem, opts = {}) ->
     return res
 
 exports.hook = hook = (elems, opts = {}) ->
-    fill_defaults(opts)
+    opts = deepmerge(defaults, opts)
     res =
         stop:   -> clearInterval(interval)
         update: ->  opts.hook.update(elems, opts)
@@ -206,22 +207,10 @@ hook.update.jQuery = (elems, opts = {}) ->
         .filter("time, [data-date]")
         .each( -> hook.update($(this), opts))
 
-
-fill_defaults =  (opts) ->
-    opts.css ?= {}
-    opts.hook ?= {}
-    opts.smart ?= {}
-    opts.locale ?= locale
-    opts.update ?= defaults.update
-    opts.css.ago ?= defaults.css.ago
-    opts.hook.interval ?= defaults.hook.interval
-    opts.hook.update ?= defaults.hook.update
-    opts.smart.max_unit ?= defaults.smart.max_unit
-    return opts
-
 # defaults (changeable)
 
 exports.options = defaults =
+    locale: locale
     update: on
     show_ago: yes
     hook:
