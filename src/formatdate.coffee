@@ -124,13 +124,17 @@ exports.strftime = strftime = (text = locale.default, d = null, loc = locale) ->
         text = text.replace(regex, f(d, loc)) if regex.test(text)
     text
 
+exports.separate_unit = separate_unit = (d) ->
+    [r, x, T] = [{}, 1, [1000, 60, 60, 24, 7, 30/7, 12, 10, 10]]
+    r.unit = u = sum(T.map( (n) -> d >= (x *= n) ))
+    r.size = s = foldl(1, T[0...u], (a, b) -> a*b )
+    r.amount   = round(d / s or 1)
+    return r
 
 exports.ago = ago = (dd, opts = {}) ->
     opts.locale ?= locale
-    [i, x, T] = [0, 1, [1000, 60, 60, 24, 7, 30/7, 12, 10, 10]]
-    i = sum(T.map( (n) -> dd >= (x *= n) ))
-    x = round( dd / foldl(1, T[0...i], (a, b) -> a*b ) or 1)
-    opts.locale.ago x, i, opts
+    {amount, unit} = separate_unit(dd)
+    opts.locale.ago amount, unit, opts
 
 
 exports.from_now = from_now = (date, opts = {}) ->
@@ -140,24 +144,43 @@ exports.from_now = from_now = (date, opts = {}) ->
     ago(now() - date.getTime(), opts) or strftime(opts.format, date, opts.locale)
 
 
+exports.smart = (elem, opts = {}) ->
+    fill_defaults(opts)
+    old_unit = -1
+    interval = undefined
+    res = stop:  -> clearInterval(interval) if interval?
+    res.update = ->
+        date = hook.update(elem, opts)
+        if not date?
+            do res.stop
+            interval = setInterval(res.update, opts.hook.interval)
+            return
+        {unit, size} = separate_unit(date)
+        return if unit is old_unit
+        return res.stop() if unit > opts.smart.max_unit
+        t = opts.hook.interval
+        t = unit * size or t if unit > 0
+        do res.stop
+        interval = setInterval(res.update, t)
+        old_unit = unit
+    do res.update
+    return res
+
 exports.hook = hook = (elems, opts = {}) ->
-    opts.css ?= {}
-    opts.hook ?= {}
-    opts.locale ?= locale
-    opts.update ?= defaults.update
-    opts.css.ago ?= defaults.css.ago
-    opts.hook.interval ?= defaults.hook.interval
-    opts.hook.update ?= defaults.hook.update
-    assimilate_elements = ->
-        opts.hook.update(elems, opts)
-    setInterval assimilate_elements, opts.hook.interval if opts.update
-    do assimilate_elements
+    fill_defaults(opts)
+    res =
+        stop:   -> clearInterval(interval)
+        update: ->  opts.hook.update(elems, opts)
+    interval = setInterval(res.update, opts.hook.interval) if opts.update
+    do res.update
+    return res
 
 
 hook.update = (el, opts = {}) ->
     # either something custom or a <time> element
     date = el?.attr?('data-date') ? el?.attr?('datetime')
     return if not date?
+    date = new Date(date) if typeof date is 'string' or typeof date is 'number'
     opts.format = el.attr('data-strftime') or opts.format
     title_format = el.attr('data-strftitle') or opts.format
     el.attr 'title', strftime title_format, date, opts.locale
@@ -165,9 +188,10 @@ hook.update = (el, opts = {}) ->
     if cls.indexOf(opts.css.ago) isnt -1
         # the 'ago' class is set, so use a relative date.
         el.text from_now date, opts
+        return now() - date.getTime()
     else
         el.text strftime opts.format, date, opts.locale
-    return
+        return date
 
 # update the ui with helpers
 
@@ -183,6 +207,18 @@ hook.update.jQuery = (elems, opts = {}) ->
         .each( -> hook.update($(this), opts))
 
 
+fill_defaults =  (opts) ->
+    opts.css ?= {}
+    opts.hook ?= {}
+    opts.smart ?= {}
+    opts.locale ?= locale
+    opts.update ?= defaults.update
+    opts.css.ago ?= defaults.css.ago
+    opts.hook.interval ?= defaults.hook.interval
+    opts.hook.update ?= defaults.hook.update
+    opts.smart.max_unit ?= defaults.smart.max_unit
+    return opts
+
 # defaults (changeable)
 
 exports.options = defaults =
@@ -191,6 +227,8 @@ exports.options = defaults =
     hook:
         interval: 5000 # 5 seconds
         update:   hook.update.jQuery
+    smart:
+        max_unit: 5 # week
     css:
         ago: "ago"
     max:
